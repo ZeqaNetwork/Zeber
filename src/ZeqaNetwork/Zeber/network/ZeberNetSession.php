@@ -27,18 +27,19 @@ class ZeberNetSession extends ServerSession{
     }
 
     public function handlePacket(string $packet): void{
-        $decoded = igbinary_unserialize($packet);
-        $id = $decoded["id"];
-        $data = $decoded["data"];
-        if($this->authenticated) {
-            $this->client->handlePacket($id, $data);
-        }else{
-            switch($id) {
-                case PacketId::LOGIN:
-                    $loginInfo = LoginInfo::create($data);
-                    ClientManager::add($this->client = new Client($this, $this->getId(), $loginInfo->name, $loginInfo->type));
-                    $this->authenticated = true;
-                    break;
+        foreach(igbinary_unserialize($packet) as $p){
+            $id = $p["id"];
+            $data = $p["data"];
+            if($this->authenticated){
+                $this->client->handlePacket($id, $data);
+            }else{
+                switch($id){
+                    case PacketId::LOGIN:
+                        $loginInfo = LoginInfo::create($data);
+                        ClientManager::add($this->client = new Client($this, $this->getId(), $loginInfo->name, $loginInfo->type));
+                        $this->authenticated = true;
+                        break;
+                }
             }
         }
     }
