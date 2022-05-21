@@ -19,30 +19,32 @@ ClientManager::getByName("AS1-Practice")?->sendPacket(
 ```
 - Handling Packet
 ```php
-    // ZeberNetSession.php
+    // Client.php
     // ...
-    public function handlePacket(string $packet): void{
-        foreach(igbinary_unserialize($packet) as $p){
-            $id = $p["id"];
-            $data = $p["data"];
-            if($this->authenticated){
-                $this->client->handlePacket($id, $data);
-            }else{
-                switch($id){
-                    case PacketId::LOGIN:
-                        $loginInfo = LoginInfo::create($data);
-                        $name = $loginInfo->name;
-                        if(ClientManager::getByName($name) !== null) {
-                            $this->sendPacket(PacketBuilder::create(PacketId::AUTH, false));
-                            $this->close();
-                            break;
-                        }
-                        ClientManager::add($this->client = new Client($this, $this->getId(), $name, $loginInfo->type));
-                        $this->authenticated = true;
-                        break;
-                }
-            }
+    public function handlePacket(string $id, mixed $data){
+        switch($id) {
+            case PacketId::FORWARD:
+                $this->handleForward($data);
+                break;
+            case PacketId::REQUEST:
+                $this->handleRequest($data);
+                break;
         }
+    }
+    // ...
+    
+    // Handle forward packet
+    // ...
+    private function handleForward(array $payload) {
+        $target = $payload["target"];
+
+        $targetClient = ClientManager::getByName($target);
+        $targetClient?->sendPacket(
+            PacketBuilder::create(
+                PacketId::FORWARD,
+                $payload
+            )
+        );
     }
     // ...
 ```
