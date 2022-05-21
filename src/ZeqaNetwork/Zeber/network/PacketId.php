@@ -10,4 +10,8 @@ class PacketId{
     const LOGIN = "login";
     // Forward packet to another client
     const FORWARD = "forward";
+    // Request to the Zeber
+    const REQUEST = "request";
+    // Response from request packet
+    const RESPONSE = "response";
 }

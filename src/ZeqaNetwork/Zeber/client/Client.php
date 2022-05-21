@@ -47,6 +47,9 @@ class Client{
             case PacketId::FORWARD:
                 $this->handleForward($data);
                 break;
+            case PacketId::REQUEST:
+                $this->handleRequest($data);
+                break;
         }
     }
 
@@ -62,5 +65,23 @@ class Client{
 
         $targetClient = ClientManager::getByName($target);
         $targetClient?->sendPacket(PacketId::FORWARD, $data);
+    }
+
+    private function handleRequest(array $data) {
+        $id = (int) $data["id"];
+        $method = $data["method"];
+        $data = $data["data"];
+        switch($method) {
+            case "total_clients":
+                $this->sendResponse($id, count(ClientManager::getAll()));
+                break;
+        }
+    }
+
+    public function sendResponse(int $id, mixed $data) {
+        $this->sendPacket(PacketId::RESPONSE, [
+            "id" => $id,
+            "data" => $data
+        ]);
     }
 }

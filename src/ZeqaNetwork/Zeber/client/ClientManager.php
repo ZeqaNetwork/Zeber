@@ -29,4 +29,11 @@ class ClientManager{
         }
         return null;
     }
+
+    /**
+     * @return Client[]
+     */
+    public static function getAll() : array{
+        return self::$clients;
+    }
 }
