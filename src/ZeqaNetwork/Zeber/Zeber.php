@@ -12,7 +12,15 @@ use ZeqaNetwork\Zeber\network\ZeberNetSession;
 
 class Zeber extends PluginBase{
 
+    private static self $instance;
+
+    public static function getInstance() : self{
+        return self::$instance;
+    }
+
     public function onEnable(): void{
+        self::$instance = $this;
+
         $cfg = $this->getConfig();
 
         $server = new ZeberServerManager(
