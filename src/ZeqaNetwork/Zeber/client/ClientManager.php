@@ -20,4 +20,13 @@ class ClientManager{
     public static function get(int $id) : ?Client{
         return self::$clients[$id] ?? null;
     }
+
+    public static function getByName(string $name) : ?Client{
+        foreach(self::$clients as $client) {
+            if($client->getName() === $name) {
+                return $client;
+            }
+        }
+        return null;
+    }
 }

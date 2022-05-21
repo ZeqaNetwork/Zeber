@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ZeqaNetwork\Zeber\client;
 
+use ZeqaNetwork\Zeber\network\PacketId;
 use ZeqaNetwork\Zeber\network\types\LoginInfo;
 use ZeqaNetwork\Zeber\network\ZeberNetSession;
 
@@ -42,5 +43,24 @@ class Client{
     }
 
     public function handlePacket(string $id, mixed $data){
+        switch($id) {
+            case PacketId::FORWARD:
+                $this->handleForward($data);
+                break;
+        }
+    }
+
+    public function sendPacket(string $id, mixed $data) {
+        $this->session->sendPacket([
+            "id" => $id,
+            "data" => $data
+        ]);
+    }
+
+    private function handleForward(array $data) {
+        $target = $data["target"];
+
+        $targetClient = ClientManager::getByName($target);
+        $targetClient?->sendPacket(PacketId::FORWARD, $data);
     }
 }
