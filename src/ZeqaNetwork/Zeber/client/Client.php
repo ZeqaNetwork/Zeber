@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace ZeqaNetwork\Zeber\client;
 
+use ZeqaNetwork\Zeber\network\builder\PacketBuilder;
+use ZeqaNetwork\Zeber\network\builder\ResponseBuilder;
 use ZeqaNetwork\Zeber\network\PacketId;
 use ZeqaNetwork\Zeber\network\types\LoginInfo;
 use ZeqaNetwork\Zeber\network\ZeberNetSession;
@@ -53,24 +55,26 @@ class Client{
         }
     }
 
-    public function sendPacket(string $id, mixed $data) {
-        $this->session->sendPacket([
-            "id" => $id,
-            "data" => $data
-        ]);
+    public function sendPacket(array $packet) {
+        $this->session->sendPacket($packet);
     }
 
-    private function handleForward(array $data) {
-        $target = $data["target"];
+    private function handleForward(array $payload) {
+        $target = $payload["target"];
 
         $targetClient = ClientManager::getByName($target);
-        $targetClient?->sendPacket(PacketId::FORWARD, $data);
+        $targetClient?->sendPacket(
+            PacketBuilder::create(
+                PacketId::FORWARD,
+                $payload
+            )
+        );
     }
 
-    private function handleRequest(array $data) {
-        $id = (int) $data["id"];
-        $method = $data["method"];
-        $data = $data["data"];
+    private function handleRequest(array $payload) {
+        $id = (int) $payload["id"];
+        $method = $payload["method"];
+        $payload = $payload["data"];
         switch($method) {
             case "total_clients":
                 $this->sendResponse($id, count(ClientManager::getAll()));
@@ -78,10 +82,7 @@ class Client{
         }
     }
 
-    public function sendResponse(int $id, mixed $data) {
-        $this->sendPacket(PacketId::RESPONSE, [
-            "id" => $id,
-            "data" => $data
-        ]);
+    public function sendResponse(int $id, mixed $payload) {
+        $this->sendPacket(ResponseBuilder::create($id, $payload));
     }
 }

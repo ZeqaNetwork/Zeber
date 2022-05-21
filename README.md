@@ -1,32 +1,26 @@
-<?php
+# Zeber
 
-declare(strict_types=1);
+### Requirements
+https://github.com/AkmalFairuz/Sobana
 
-namespace ZeqaNetwork\Zeber\network;
-
-use AkmalFairuz\Sobana\server\ServerSession;
-use pocketmine\utils\Utils;
-use ZeqaNetwork\Zeber\client\Client;
-use ZeqaNetwork\Zeber\client\ClientManager;
-use ZeqaNetwork\Zeber\network\builder\PacketBuilder;
-use ZeqaNetwork\Zeber\network\types\LoginInfo;
-use function igbinary_unserialize;
-use function json_encode;
-use function json_last_error_msg;
-
-class ZeberNetSession extends ServerSession{
-
-    private Client $client;
-    private bool $authenticated = false;
-
-    public function onConnect(): void{
-
-    }
-
-    public function sendPacket(array $packet) {
-        $this->write(Utils::assumeNotFalse(json_encode($packet), "Failed to encode JSON: " . json_last_error_msg()));
-    }
-
+### Usage
+- Sending Packet
+```php
+// Send packet by client name
+ClientManager::getByName("AS1-Practice")?->sendPacket(
+    ForwardBuilder::create(
+        "zeber", 
+        [
+            "action" => "broadcast_message", 
+            "message" => "Hi"
+        ]
+    )
+);
+```
+- Handling Packet
+```php
+    // ZeberNetSession.php
+    // ...
     public function handlePacket(string $packet): void{
         foreach(igbinary_unserialize($packet) as $p){
             $id = $p["id"];
@@ -50,10 +44,5 @@ class ZeberNetSession extends ServerSession{
             }
         }
     }
-
-    public function onClose(): void{
-        if(isset($this->client)){
-            ClientManager::remove($this->client);
-        }
-    }
-}
+    // ...
+```
