@@ -32,7 +32,7 @@ class PacketDecoder extends \AkmalFairuz\Sobana\encoding\PacketDecoder{
             $payload = substr($buffer, $offset, $len);
             $offset += $len;
             Utils::assumeNotFalse($decompressed = zlib_decode($payload));
-            Utils::assumeNotFalse($decoded = json_decode($decompressed), "Failed to decode json: " . json_last_error_msg());
+            Utils::assumeNotFalse($decoded = json_decode($decompressed, true), "Failed to decode json: " . json_last_error_msg());
             $ret[] = $decoded;
         }
         $this->saveBuffer(substr($buffer, $offset));

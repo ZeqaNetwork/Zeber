@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace ZeqaNetwork\Zeber\network;
 
 use AkmalFairuz\Sobana\server\ServerSession;
+use pocketmine\Server;
+use pocketmine\utils\TextFormat;
 use pocketmine\utils\Utils;
 use ZeqaNetwork\Zeber\client\Client;
 use ZeqaNetwork\Zeber\client\ClientManager;
@@ -43,8 +45,10 @@ class ZeberNetSession extends ServerSession{
                             $this->close();
                             break;
                         }
+                        $this->sendPacket(PacketBuilder::create(PacketId::AUTH, true));
                         ClientManager::add($this->client = new Client($this, $this->getId(), $name, $loginInfo->type));
                         $this->authenticated = true;
+                        Server::getInstance()->getLogger()->info(TextFormat::GREEN . "Authenticated from $name " . TextFormat::GRAY . $this->getIp() . ":" . $this->getPort());
                         break;
                 }
             }
