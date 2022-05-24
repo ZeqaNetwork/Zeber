@@ -72,6 +72,18 @@ class Client{
 					);
 				}
 				return;
+			}elseif($targets === "others_clients"){
+				foreach(ClientManager::getAll() as $targetClient){
+					if($targetClient?->getId() !== $this->getId()){
+						$targetClient->sendPacket(
+							PacketBuilder::create(
+								PacketId::FORWARD,
+								$payload
+							)
+						);
+					}
+				}
+				return;
 			}
 			$targets = [$targets];
 		}
