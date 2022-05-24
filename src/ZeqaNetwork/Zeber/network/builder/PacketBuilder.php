@@ -6,10 +6,10 @@ namespace ZeqaNetwork\Zeber\network\builder;
 
 class PacketBuilder{
 
-    public static function create(string $id, mixed $data) {
-        return [
-            "id" => $id,
-            "data" => $data
-        ];
-    }
+	public static function create(string $id, mixed $data){
+		return [
+			"id" => $id,
+			"data" => $data
+		];
+	}
 }

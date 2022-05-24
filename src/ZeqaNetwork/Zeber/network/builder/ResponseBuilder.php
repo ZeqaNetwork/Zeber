@@ -8,10 +8,10 @@ use ZeqaNetwork\Zeber\network\PacketId;
 
 class ResponseBuilder{
 
-    public static function create(int $id, mixed $payload) {
-        return PacketBuilder::create(PacketId::FORWARD, [
-            "id" => $id,
-            "payload" => $payload
-        ]);
-    }
+	public static function create(int $id, mixed $payload){
+		return PacketBuilder::create(PacketId::FORWARD, [
+			"id" => $id,
+			"payload" => $payload
+		]);
+	}
 }

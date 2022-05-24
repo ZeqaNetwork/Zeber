@@ -6,16 +6,16 @@ namespace ZeqaNetwork\Zeber\network\types;
 
 class LoginInfo{
 
-    const TYPE_SERVER = 0;
-    const TYPE_PROXY = 1;
+	const TYPE_SERVER = 0;
+	const TYPE_PROXY = 1;
 
-    public function __construct(
-        public string $name,
-        public int $type
-    ){
-    }
+	public function __construct(
+		public string $name,
+		public int $type
+	){
+	}
 
-    public static function create(array $data) {
-        return new self($data["name"], (int) $data["type"]);
-    }
+	public static function create(array $data){
+		return new self($data["name"], (int) $data["type"]);
+	}
 }
