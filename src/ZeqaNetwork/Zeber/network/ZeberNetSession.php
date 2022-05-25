@@ -46,9 +46,9 @@ class ZeberNetSession extends ServerSession{
 							break;
 						}
 						$this->sendPacket(PacketBuilder::create(PacketId::AUTH, true));
-						ClientManager::add($this->client = new Client($this, $this->getId(), $name, $loginInfo->type));
+						ClientManager::add($this->client = new Client($this, $this->getId(), $name, $parent = $loginInfo->parent, $loginInfo->type));
 						$this->authenticated = true;
-						Server::getInstance()->getLogger()->info(TextFormat::GREEN . "Authenticated from $name " . TextFormat::GRAY . $this->getIp() . ":" . $this->getPort());
+						Server::getInstance()->getLogger()->info(TextFormat::GREEN . "Authenticated from $name (parent: $parent) " . TextFormat::GRAY . $this->getIp() . ":" . $this->getPort());
 						break;
 				}
 			}

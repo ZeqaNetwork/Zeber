@@ -11,11 +11,12 @@ class LoginInfo{
 
 	public function __construct(
 		public string $name,
+		public string $parent,
 		public int $type
 	){
 	}
 
 	public static function create(array $data){
-		return new self($data["name"], (int) $data["type"]);
+		return new self($data["name"], $data["parent"], (int) $data["type"]);
 	}
 }

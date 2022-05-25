@@ -9,6 +9,10 @@ use ZeqaNetwork\Zeber\network\builder\ResponseBuilder;
 use ZeqaNetwork\Zeber\network\PacketId;
 use ZeqaNetwork\Zeber\network\types\LoginInfo;
 use ZeqaNetwork\Zeber\network\ZeberNetSession;
+use function array_filter;
+use function array_map;
+use function count;
+use function is_string;
 
 class Client{
 
@@ -16,6 +20,7 @@ class Client{
 		private ZeberNetSession $session,
 		private int $id,
 		private string $name,
+		private string $parent,
 		private int $type
 	){
 	}
@@ -30,6 +35,10 @@ class Client{
 
 	public function getName() : string{
 		return $this->name;
+	}
+
+	public function getParent() : string{
+		return $this->parent;
 	}
 
 	public function getType() : int{
@@ -61,41 +70,24 @@ class Client{
 
 	private function handleForward(array $payload){
 		$targets = $payload["targets"];
-		if(!is_array($targets)){
-			if($targets === "all_clients"){
-				foreach(ClientManager::getAll() as $targetClient){
-					$targetClient?->sendPacket(
-						PacketBuilder::create(
-							PacketId::FORWARD,
-							$payload
-						)
-					);
-				}
-				return;
-			}elseif($targets === "others_clients"){
-				foreach(ClientManager::getAll() as $targetClient){
-					if($targetClient?->getId() !== $this->getId()){
-						$targetClient->sendPacket(
-							PacketBuilder::create(
-								PacketId::FORWARD,
-								$payload
-							)
-						);
-					}
-				}
-				return;
-			}
-			$targets = [$targets];
+		if(is_string($targets)){
+			$targets = match ($targets) {
+				"all_clients" => ClientManager::getAll(),
+				"others_clients" => array_filter(ClientManager::getAll(), function(?Client $client) : bool{
+					return $client !== null && $client->getId() !== $this->id;
+				}),
+				"parent_clients" => array_filter(ClientManager::getAll(), function(?Client $client) : bool{
+					return $client !== null && $client->getId() !== $this->id && $client->getParent() === $this->parent;
+				}),
+				default => [ClientManager::getByName($targets)],
+			};
+		}else{
+			$targets = array_map(function(string $target) : ?Client{
+				return ClientManager::getByName($target);
+			}, $targets);
 		}
-
 		foreach($targets as $target){
-			$targetClient = ClientManager::getByName($target);
-			$targetClient?->sendPacket(
-				PacketBuilder::create(
-					PacketId::FORWARD,
-					$payload
-				)
-			);
+			$target?->sendPacket(PacketBuilder::create(PacketId::FORWARD, $payload));
 		}
 	}
 
