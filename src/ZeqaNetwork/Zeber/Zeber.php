@@ -24,6 +24,7 @@ class Zeber extends PluginBase{
 		$cfg = $this->getConfig();
 
 		$server = new ZeberServerManager(
+			$this,
 			$cfg->get("listen_address", "0.0.0.0"),
 			(int) $cfg->get("listen_port", 5770),
 			ZeberNetSession::class,
